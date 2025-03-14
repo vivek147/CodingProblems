@@ -1,0 +1,130 @@
+public class Program
+{
+	/*
+	Design a LRU Cachce
+	LRU cache stands for Least Recently Used cache, which is a caching algorithm that removes the least recently accessed items from a cache when it reaches its maximum size. 
+	The idea is that the most recently accessed data is likely to be accessed again soon, so it's best to keep it available in the cache
+	
+	It should have capacity feature
+	*/
+	
+	public static void Main()
+	{	
+     // a b c d e 
+    //  e b f c h
+     // LinkList --  -ref-node-next  --> a-next , b , c , e --> null
+
+     // pre-node-next 
+
+
+   //  ----- elimanted a,add  -> rear
+    // --- elimated  b, add  --> rear
+    //  c,add  --> rear
+    //  d,add -- > 
+    //  e,add  --> front
+
+    //  hashmap ()  -- key,add
+
+     var lruManager =  new LRUCacheManager(3);
+        lruCacheManager.AddToCache('a');
+        lruCacheManager.AddToCache('b');
+        lruCacheManager.AddToCache('c');
+
+        Console.WriteLine(lruCacheManager.FindFromCache('a')); // Output should be : a . also refrensh logic will keep a in the most recnt prioritization 
+        
+        lruCacheManager.AddToCache('b');  // now this will remove b as this is used least since c is added last to b will oldest and never used yet. 
+
+        Console.WriteLine(lruCacheManager.FindFromCache('b')); // since b is deleted while previous steps it should print null accoding to ask. 
+        
+
+    }
+}
+
+/*public class LRUCache
+{
+    public int CacheIdentifier { get; set; } 
+    public char Key { get; set; }
+    public string Data { get; set; }
+}
+ */
+
+/*Methods :- 
+ 0. CreateUpdateCache()
+ 1. addToCache() 
+ 2. deleteFromCache()
+ 3. FindFromCache()
+ 4.RefreshCacheList()
+ */
+public class LRUCacheManager
+{
+    private int capacity;
+    private Dictionary<char, LinkedListNode<char>> cacheMap;
+    private LinkedList<char> lruCacheManagerList;
+
+   public LRUCacheManager(int capacity)
+    {
+        this.capacity = capacity;
+        cacheMap = new Dictionary<char, LinkedListNode<char>>();
+        lruCacheManagerList = new LinkedList<char>();
+    }
+  
+  private bool CreateUpdateCache()
+  {
+    if(cacheMap==null)
+    cacheMap = new new Dictionary<char, LinkedListNode<char>>();
+  
+    if(lruCacheMangerList==null)
+    lruCacheMangerList =  new Dictionary<char, LinkedListNode<char>>();
+     return true;
+  }
+
+    public bool AddToCache(char data)
+    {
+        if (cacheMap.ContainsKey(data))
+        {
+            RefreshCacheList(data);
+            return true;
+        }
+
+       if (cacheMap.Count >= capacity)
+        {
+            // Remove the least recently used item
+            var lru = lruCacheManagerList.Last;
+            lruCacheManagerList.RemoveLast();
+            cacheMap.Remove(lru.Value);
+        }
+
+      // Add the new data to the cache
+        var newNode = new LinkedListNode<char>(data);
+        lruCacheManagerList.AddFirst(newNode);
+       
+      //add to Map
+        cacheMap[data] = newNode;
+
+       return true;
+     }
+
+      private Char? FindFromCache(char data)
+      {
+        // this will find most recent also reaggange data to make sure its most reecent priority
+        if (cacheMap.TryGetValue(data, out var node))
+        {
+            RefreshCacheList(data);
+            return node.Value;
+        }
+        return null;
+      }
+
+
+     // To cover use case for : - most recently accessed data is likely to be accessed again soon, so it's best to keep it available in the cache
+     private void RefreshCacheList(char data)
+     {
+       if (cacheMap.TryGetValue(data, out var node))
+        {
+            lruCacheManagerList.Remove(node);
+            lruCacheManagerList.AddFirst(node);
+        }
+       }
+}
+}
+
